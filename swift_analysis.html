@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT Analysis - Hammilha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Dark Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Matrix Rain */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #667eea;
+            text-shadow: 0 0 5px #667eea;
+            animation: matrixFall linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes matrixFall {
+            to { top: 100%; }
+        }
+
+        /* Hexagon Grid */
+        .hex-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(102, 126, 234, 0.03) 0px, transparent 1px, transparent 60px),
+                repeating-linear-gradient(90deg, rgba(102, 126, 234, 0.03) 0px, transparent 1px, transparent 60px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Scanning Line */
+        .scan-wave {
+            position: fixed;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            animation: scanMove 4s linear infinite;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 25px 40px;
+            position: relative;
+            z-index: 10;
+            border-bottom: 2px solid #00ffff;
+            box-shadow: 0 5px 30px rgba(0, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .header .subtitle {
+            color: #00ffff;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            color: #1C3D5A;
+            border: 2px solid #667eea;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Office Scene */
+        .office-scene {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            animation: cardFloat 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .office-scene::before {
+            content: '🏢 КОМАНДНОЕ СОВЕЩАНИЕ';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            color: #1C3D5A;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Team Container */
+        .team-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 40px;
+            flex-wrap: wrap;
+            min-height: 280px;
+        }
+
+        /* Cartoon Team Member */
+        .team-member {
+            position: relative;
+            animation: memberFloat 2s ease-in-out infinite;
+        }
+
+        .team-member:nth-child(1) { animation-delay: 0s; }
+        .team-member:nth-child(2) { animation-delay: 0.3s; }
+        .team-member:nth-child(3) { animation-delay: 0.6s; }
+        .team-member:nth-child(4) { animation-delay: 0.9s; }
+        .team-member:nth-child(5) { animation-delay: 1.2s; }
+
+        @keyframes memberFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Speech Bubble for Team */
+        .team-bubble {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 12px 15px;
+            border-radius: 15px;
+            min-width: 180px;
+            max-width: 220px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            border: 3px solid #00ffff;
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #333;
+            display: none;
+        }
+
+        .team-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: white;
+        }
+
+        .team-bubble.show {
+            display: block;
+            animation: bubbleShow 0.4s ease-out forwards;
+        }
+
+        @keyframes bubbleShow {
+            from { opacity: 0; transform: translateX(-50%) scale(0.5); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        /* Team Member Body */
+        .member-body {
+            width: 90px;
+            position: relative;
+        }
+
+        .member-head {
+            width: 60px;
+            height: 60px;
+            background: #FFE4C4;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            position: relative;
+            border: 3px solid;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .member-hair {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 35px;
+            border-radius: 50% 50% 0 0;
+        }
+
+        .member-eyes {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            letter-spacing: 10px;
+        }
+
+        .member-mouth {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 8px;
+            border-bottom: 2px solid #333;
+            border-radius: 0 0 18px 18px;
+        }
+
+        .member-torso {
+            width: 75px;
+            height: 90px;
+            margin: 0 auto;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Team Member Colors */
+        .member-1 .member-head { border-color: #667eea; }
+        .member-1 .member-hair { background: #8B4513; }
+        .member-1 .member-torso { background: #667eea; }
+
+        .member-2 .member-head { border-color: #00cccc; }
+        .member-2 .member-hair { background: #4A4A4A; }
+        .member-2 .member-torso { background: #00cccc; }
+
+        .member-3 .member-head { border-color: #2a7d5a; }
+        .member-3 .member-hair { background: #2F1B0C; }
+        .member-3 .member-torso { background: #2a7d5a; }
+
+        .member-4 .member-head { border-color: #7d2a5a; }
+        .member-4 .member-hair { background: #654321; }
+        .member-4 .member-torso { background: #7d2a5a; }
+
+        .member-5 .member-head { border-color: #5a2a7d; }
+        .member-5 .member-hair { background: #1a1a1a; }
+        .member-5 .member-torso { background: #5a2a7d; }
+
+        .member-talking .member-mouth {
+            animation: memberTalk 0.3s infinite;
+        }
+
+        @keyframes memberTalk {
+            0%, 100% { height: 8px; }
+            50% { height: 14px; border-radius: 50%; }
+        }
+
+        .member-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .member-name {
+            color: #00ffff;
+            font-size: 1em;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        .member-role {
+            color: #667eea;
+            font-size: 0.8em;
+        }
+
+        /* Risk Analysis Cards */
+        .risk-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.3);
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #00ffff;
+        }
+
+        .risk-number {
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            color: #1C3D5A;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            animation: numberPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .risk-title {
+            font-size: 1.5em;
+            color: #00ffff;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Discussion Table */
+        .swift-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .swift-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .swift-table td {
+            padding: 20px;
+            border-bottom: 2px solid #E0E0E0;
+            vertical-align: top;
+            line-height: 1.7;
+        }
+
+        .swift-table tbody tr {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .swift-table tbody tr.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .swift-table tbody tr:hover {
+            background: #F0F8FF;
+        }
+
+        .swift-table td:first-child {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.05em;
+            background: #F5F0FF;
+            width: 250px;
+        }
+
+        .swift-table td:last-child {
+            background: #F8F9FA;
+            width: 280px;
+            font-size: 0.95em;
+        }
+
+        /* Team Comments in Table */
+        .team-comment {
+            background: white;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .comment-author {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+        }
+
+        .comment-text {
+            color: #333;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* Action Items */
+        .action-box {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            color: #1C3D5A;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+            border: 2px solid #667eea;
+        }
+
+        .action-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .action-list {
+            list-style: none;
+        }
+
+        .action-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1em;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .action-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1em;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="hex-grid"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
+    <div class="scan-wave"></div>
+    <div class="scan-wave" style="animation-delay: 2s;"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>👥 SWIFT АНАЛИЗ</h1>
+            <div class="subtitle">Structured What-If Technique | Командное обсуждение</div>
+        </div>
+        <button class="back-btn" onclick="window.location.href='risk_analysis_main.html'">← Назад</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Office Scene with Team -->
+        <div class="office-scene">
+            <div class="team-container">
+                <!-- Team Member 1 - Naji -->
+                <div class="team-member member-1" id="member1">
+                    <div class="team-bubble" id="bubble1"></div>
+                    <div class="member-body">
+                        <div class="member-head">
+                            <div class="member-hair"></div>
+                            
+                            <div class="member-mouth"></div>
+                        </div>
+                        <div class="member-torso"></div>
+                    </div>
+                    <div class="member-label">
+                        <div class="member-name">Наджи</div>
+                        <div class="member-role">Руководитель</div>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 - Alexey -->
+                <div class="team-member member-2" id="member2">
+                    <div class="team-bubble" id="bubble2"></div>
+                    <div class="member-body">
+                        <div class="member-head">
+                            <div class="member-hair"></div>
+                            
+                            <div class="member-mouth"></div>
+                        </div>
+                        <div class="member-torso"></div>
+                    </div>
+                    <div class="member-label">
+                        <div class="member-name">Алексей</div>
+                        <div class="member-role">Backend</div>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 - Omar -->
+                <div class="team-member member-3" id="member3">
+                    <div class="team-bubble" id="bubble3"></div>
+                    <div class="member-body">
+                        <div class="member-head">
+                            <div class="member-hair"></div>
+                            
+                            <div class="member-mouth"></div>
+                        </div>
+                        <div class="member-torso"></div>
+                    </div>
+                    <div class="member-label">
+                        <div class="member-name">Омар</div>
+                        <div class="member-role">Frontend</div>
+                    </div>
+                </div>
+
+                <!-- Team Member 4 - Sara -->
+                <div class="team-member member-4" id="member4">
+                    <div class="team-bubble" id="bubble4"></div>
+                    <div class="member-body">
+                        <div class="member-head">
+                            <div class="member-hair"></div>
+                            
+                            <div class="member-mouth"></div>
+                        </div>
+                        <div class="member-torso"></div>
+                    </div>
+                    <div class="member-label">
+                        <div class="member-name">Сара</div>
+                        <div class="member-role">Аналитик</div>
+                    </div>
+                </div>
+
+                <!-- Team Member 5 - Karim -->
+                <div class="team-member member-5" id="member5">
+                    <div class="team-bubble" id="bubble5"></div>
+                    <div class="member-body">
+                        <div class="member-head">
+                            <div class="member-hair"></div>
+                            
+                            <div class="member-mouth"></div>
+                        </div>
+                        <div class="member-torso"></div>
+                    </div>
+                    <div class="member-label">
+                        <div class="member-name">Карим</div>
+                        <div class="member-role">Маркетинг</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk 1 -->
+        <div class="risk-card" id="risk1">
+            <div class="risk-header">
+                <div class="risk-number">1</div>
+                <div class="risk-title">Потеря ключевого разработчика</div>
+            </div>
+
+            <table class="swift-table">
+                <thead>
+                    <tr>
+                        <th>Что если...?</th>
+                        <th>Обсуждение команды</th>
+                        <th>Последствия</th>
+                    </tr>
+                </thead>
+                <tbody id="risk1Body">
+                    <tr>
+                        <td>Что если Laravel разработчик уволится?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Наджи:</div>
+                                <div class="comment-text">У нас только один backend разработчик. Это критическая точка отказа.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Алексей:</div>
+                                <div class="comment-text">Вся бизнес-логика и API написаны мной. Документации пока нет.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Омар:</div>
+                                <div class="comment-text">Frontend полностью зависит от API. Без backend мы остановимся.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Полная остановка разработки<br>
+                            • Потеря 2-3 месяца на поиск замены<br>
+                            • Бюджет увеличится на $500+<br>
+                            • Пропуск окна устойчивости
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Что если разработчик заболеет на 2+ недели?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Сара:</div>
+                                <div class="comment-text">При текущей скорости $100/месяц мы не можем нанять дублера.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Наджи:</div>
+                                <div class="comment-text">Критические баги не будут исправлены. Клиенты уйдут к конкуренту.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Сервис работает с ошибками<br>
+                            • Отток первых пользователей<br>
+                            • Негативные отзывы<br>
+                            • Проблемы с репутацией
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Что если Yandex Cloud credentials будут утеряны?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Алексей:</div>
+                                <div class="comment-text">Все ключи только у меня локально. Нет общего хранилища.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Карим:</div>
+                                <div class="comment-text">Это огромный риск! База данных клиентов будет недоступна.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Потеря доступа к серверу<br>
+                            • Данные клиентов недоступны<br>
+                            • Нарушение закона о защите данных<br>
+                            • Юридические проблемы
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="action-box">
+                <div class="action-title">📋 ПЛАН ДЕЙСТВИЙ:</div>
+                <ul class="action-list">
+                    <li>Создать полную документацию кода в течение 2 недель</li>
+                    <li>Настроить общее хранилище ключей (Vault или аналог)</li>
+                    <li>Обучить Омара базовым навыкам Laravel для экстренных случаев</li>
+                    <li>Создать резервную копию всех критических данных еженедельно</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Risk 2 -->
+        <div class="risk-card" id="risk2">
+            <div class="risk-header">
+                <div class="risk-number">2</div>
+                <div class="risk-title">Низкий спрос в регионах</div>
+            </div>
+
+            <table class="swift-table">
+                <thead>
+                    <tr>
+                        <th>Что если...?</th>
+                        <th>Обсуждение команды</th>
+                        <th>Последствия</th>
+                    </tr>
+                </thead>
+                <tbody id="risk2Body">
+                    <tr>
+                        <td>Что если в малых городах не будет пользователей?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Карим:</div>
+                                <div class="comment-text">SEO-стратегия работает для крупных городов, но не для регионов.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Сара:</div>
+                                <div class="comment-text">Критическая масса за 3 месяца недостижима без локального маркетинга.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Наджи:</div>
+                                <div class="comment-text">У нас нет бюджета на маркетолога. Это серьёзная проблема.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Не достигнем критической массы<br>
+                            • Операторы Sattaha уйдут<br>
+                            • Убытки $100/месяц без дохода<br>
+                            • Провал запуска в регионах
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Что если конкурент начнёт агрессивную рекламу?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Карим:</div>
+                                <div class="comment-text">Единственный конкурент может инвестировать в рекламу раньше нас.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Омар:</div>
+                                <div class="comment-text">Наше PWA и GPS-сопоставление — преимущество, но о нём никто не знает.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Потеря конкурентного преимущества<br>
+                            • Первые пользователи уйдут<br>
+                            • Сложнее привлечь операторов<br>
+                            • Точка безубыточности сдвинется
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Что если сезонный пик не принесёт роста?</td>
+                        <td>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Сара:</div>
+                                <div class="comment-text">Зимой и летом больше поломок, но если нет узнаваемости — не поможет.</div>
+                            </div>
+                            <div class="team-comment">
+                                <div class="comment-author">💬 Наджи:</div>
+                                <div class="comment-text">2 месяца бесплатной подписки — наш единственный шанс привлечь операторов.</div>
+                            </div>
+                        </td>
+                        <td>
+                            • Упущенная возможность роста<br>
+                            • Запас бюджета сократится<br>
+                            • Необходимость искать инвестиции<br>
+                            • Риск закрытия проекта
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="action-box">
+                <div class="action-title">📋 ПЛАН ДЕЙСТВИЙ:</div>
+                <ul class="action-list">
+                    <li>Сфокусироваться на 2-3 крупных городах вместо всей Саудовской Аравии</li>
+                    <li>Партнёрство с местными автосервисами для продвижения</li>
+                    <li>Создать реферальную программу для операторов Sattaha</li>
+                    <li>Подготовить видео-отзывы первых клиентов для социальных сетей</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Hammilha Project | SWIFT Analysis | Kazan Federal University | 2025
+    </div>
+
+    <script>
+        // Matrix Rain
+        const matrixContainer = document.getElementById('matrixRain');
+        const chars = '01アイウエオカキクケコ';
+        const columns = Math.floor(window.innerWidth / 25);
+
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = (i * 25) + 'px';
+            column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            column.style.animationDelay = (Math.random() * 5) + 's';
+            
+            let text = '';
+            for (let j = 0; j < 25; j++) {
+                text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+            }
+            column.innerHTML = text;
+            matrixContainer.appendChild(column);
+        }
+
+        // Team Discussion Animation
+        const teamComments = [
+            { member: 1, text: "Давайте обсудим риски!" },
+            { member: 2, text: "Код нужно документировать" },
+            { member: 3, text: "Frontend готов!" },
+            { member: 4, text: "Анализ завершён" },
+            { member: 5, text: "Рынок изучен!" }
+        ];
+
+        let currentSpeaker = 0;
+
+        function showTeamTalk() {
+            // Hide all bubbles and stop talking
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('bubble' + i).classList.remove('show');
+                document.getElementById('member' + i).classList.remove('member-talking');
+            }
+
+            // Show current speaker
+            const speaker = teamComments[currentSpeaker];
+            const bubble = document.getElementById('bubble' + speaker.member);
+            const member = document.getElementById('member' + speaker.member);
+            
+            bubble.textContent = speaker.text;
+            bubble.classList.add('show');
+            member.classList.add('member-talking');
+
+            currentSpeaker = (currentSpeaker + 1) % teamComments.length;
+
+            setTimeout(showTeamTalk, 3000);
+        }
+
+        // Animate table rows
+        const risk1Rows = document.querySelectorAll('#risk1Body tr');
+        const risk2Rows = document.querySelectorAll('#risk2Body tr');
+
+        setTimeout(() => {
+            risk1Rows.forEach((row, index) => {
+                setTimeout(() => row.classList.add('visible'), index * 800);
+            });
+        }, 500);
+
+        setTimeout(() => {
+            risk2Rows.forEach((row, index) => {
+                setTimeout(() => row.classList.add('visible'), index * 800);
+            });
+        }, 3000);
+
+        // Start team discussion
+        setTimeout(showTeamTalk, 2000);
+    </script>
+</body>
+</html>

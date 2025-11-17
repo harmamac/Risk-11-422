@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Analysis - Hammilha Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Dark Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Matrix Rain */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #667eea;
+            text-shadow: 0 0 5px #667eea;
+            animation: matrixFall linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes matrixFall {
+            to { top: 100%; }
+        }
+
+        /* Hexagon Grid */
+        .hex-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.03) 0px, transparent 1px, transparent 60px),
+                repeating-linear-gradient(90deg, rgba(0, 255, 255, 0.03) 0px, transparent 1px, transparent 60px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Scanning Lines */
+        .scan-wave {
+            position: fixed;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            animation: scanMove 4s linear infinite;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0.8;
+            }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 4em;
+            color: #00ffff;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 60px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+            letter-spacing: 5px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 60px rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 50px rgba(0, 255, 255, 1), 0 0 100px rgba(0, 255, 255, 0.8);
+            }
+        }
+
+        .header .subtitle {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            animation: subtitlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes subtitlePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .header .project-name {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 15px;
+            letter-spacing: 2px;
+        }
+
+        /* Cards Container */
+        .cards-container {
+            display: flex;
+            gap: 80px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Analysis Cards */
+        .analysis-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            width: 420px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 1s ease-out backwards;
+            border: 2px solid #667eea;
+        }
+
+        .analysis-card:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .analysis-card:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .analysis-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #00ffff, #667eea);
+            background-size: 400% 400%;
+            animation: borderGlow 4s ease infinite;
+            border-radius: 30px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .analysis-card:hover::before {
+            opacity: 1;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            box-shadow: 0 0 80px rgba(0, 255, 255, 0.6);
+            border-color: #00ffff;
+        }
+
+        .card-icon {
+            font-size: 90px;
+            margin-bottom: 25px;
+            animation: iconFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        .card-title {
+            font-size: 2.5em;
+            color: #00ffff;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .card-description {
+            font-size: 1.05em;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .card-description strong {
+            color: #667eea;
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            border: 2px solid #00ffff;
+        }
+
+        .analysis-card:hover .card-badge {
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            color: #1C3D5A;
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1em;
+            z-index: 10;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 950px) {
+            .cards-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .analysis-card {
+                width: 100%;
+                max-width: 420px;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="hex-grid"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
+    <div class="scan-wave"></div>
+    <div class="scan-wave" style="animation-delay: 2s;"></div>
+
+    <!-- Floating Particles -->
+    <div class="particle" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 60%; left: 15%; animation-delay: 3s;"></div>
+    <div class="particle" style="top: 30%; right: 20%; animation-delay: 6s;"></div>
+    <div class="particle" style="top: 70%; right: 10%; animation-delay: 9s;"></div>
+    <div class="particle" style="top: 40%; left: 50%; animation-delay: 12s;"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>АНАЛИЗ РИСКОВ</h1>
+            <div class="subtitle">Risk Management Analysis</div>
+            <div class="project-name">Проект: Hammilha - Платформа эвакуации транспорта</div>
+        </div>
+
+        <div class="cards-container">
+            <!-- SWIFT Card -->
+            <div class="analysis-card" onclick="window.location.href='swift_analysis.html'">
+                <div class="card-title">SWIFT</div>
+                <div class="card-description">
+                    Structured What-If Technique<br>
+                    Командное обсуждение сценариев "Что если...?"<br>
+                    <strong>2 риска</strong> анализируются командой
+                </div>
+                <div class="card-badge">Начать анализ →</div>
+            </div>
+
+            <!-- RCA Card -->
+            <div class="analysis-card" onclick="window.location.href='rca_analysis.html'">
+                <div class="card-title">RCA</div>
+                <div class="card-description">
+                    Root Cause Analysis<br>
+                    Диалог " Почему?" для поиска корневой причины<br>
+                    <strong>1 риск</strong> анализируется в диалоге
+                </div>
+                <div class="card-badge">Начать анализ →</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Kazan Federal University | Risk Management  | 2025
+    </div>
+
+    <script>
+        // Generate Matrix Rain
+        const matrixContainer = document.getElementById('matrixRain');
+        const chars = '01アイウエオカキクケコサシスセソ';
+        const columns = Math.floor(window.innerWidth / 25);
+
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = (i * 25) + 'px';
+            column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            column.style.animationDelay = (Math.random() * 5) + 's';
+            
+            let text = '';
+            for (let j = 0; j < 25; j++) {
+                text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+            }
+            column.innerHTML = text;
+            matrixContainer.appendChild(column);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCA Analysis - Hammilha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Dark Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Matrix Rain */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            animation: matrixFall linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes matrixFall {
+            to { top: 100%; }
+        }
+
+        /* Hexagon Grid */
+        .hex-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.03) 0px, transparent 1px, transparent 60px),
+                repeating-linear-gradient(90deg, rgba(0, 255, 255, 0.03) 0px, transparent 1px, transparent 60px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Scanning Line */
+        .scan-wave {
+            position: fixed;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            box-shadow: 0 0 20px #667eea, 0 0 40px #667eea;
+            animation: scanMove 4s linear infinite;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 25px 40px;
+            position: relative;
+            z-index: 10;
+            border-bottom: 2px solid #667eea;
+            box-shadow: 0 5px 30px rgba(102, 126, 234, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .header .risk-name {
+            color: #667eea;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: 2px solid #00ffff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Office Scene */
+        .office-scene {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.3);
+            animation: cardFloat 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .office-scene::before {
+            content: '🏢 ОФИС HAMMILHA';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* People Container */
+        .people-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 150px;
+            min-height: 350px;
+            position: relative;
+        }
+
+        /* Cartoon Person */
+        .cartoon-person {
+            position: relative;
+            animation: personBounce 2s ease-in-out infinite;
+        }
+
+        .cartoon-person:nth-child(1) { animation-delay: 0s; }
+        .cartoon-person:nth-child(2) { animation-delay: 0.5s; }
+
+        @keyframes personBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            min-width: 250px;
+            max-width: 350px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            animation: bubblePop 0.5s ease-out forwards;
+            border: 3px solid #667eea;
+        }
+
+        @keyframes bubblePop {
+            from { opacity: 0; transform: translateX(-50%) scale(0.5); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: white;
+        }
+
+        .speech-bubble .speaker {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .speech-bubble .message {
+            color: #333;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        /* Person Body - Cartoon Style */
+        .person-body {
+            width: 120px;
+            position: relative;
+        }
+
+        /* Head */
+        .person-head {
+            width: 80px;
+            height: 80px;
+            background: #FFE4C4;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            position: relative;
+            border: 3px solid #333;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Hair */
+        .person-hair {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85px;
+            height: 45px;
+            border-radius: 50% 50% 0 0;
+        }
+
+        .person-1 .person-hair { background: #8B4513; }
+        .person-2 .person-hair { background: #2F1B0C; }
+
+        /* Face */
+        .person-eyes {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            letter-spacing: 15px;
+        }
+
+        .person-mouth {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 12px;
+            border-bottom: 3px solid #333;
+            border-radius: 0 0 25px 25px;
+        }
+
+        /* Torso */
+        .person-torso {
+            width: 100px;
+            height: 120px;
+            margin: 0 auto;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .person-1 .person-torso { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+        }
+        .person-2 .person-torso { 
+            background: linear-gradient(135deg, #00ffff, #0099cc);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Arms */
+        .person-arms {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+        }
+
+        .arm {
+            position: absolute;
+            width: 20px;
+            height: 80px;
+            border-radius: 10px;
+        }
+
+        .person-1 .arm { background: #667eea; }
+        .person-2 .arm { background: #00cccc; }
+
+        .arm-left {
+            left: -15px;
+            transform: rotate(15deg);
+        }
+
+        .arm-right {
+            right: -15px;
+            transform: rotate(-15deg);
+        }
+
+        /* Person talking animation */
+        .person-talking .person-mouth {
+            animation: talk 0.3s infinite;
+        }
+
+        @keyframes talk {
+            0%, 100% { height: 12px; }
+            50% { height: 18px; border-radius: 50%; }
+        }
+
+        /* Person Labels */
+        .person-label {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .person-name {
+            color: #00ffff;
+            font-size: 1.3em;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        .person-role {
+            color: #667eea;
+            font-size: 0.95em;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+        }
+
+        /* RCA Table */
+        .rca-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .rca-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rca-table th:first-child {
+            width: 80px;
+            text-align: center;
+        }
+
+        .rca-table td {
+            padding: 20px;
+            border-bottom: 2px solid #E0E0E0;
+            vertical-align: top;
+            line-height: 1.7;
+            font-size: 1em;
+        }
+
+        .rca-table tbody tr {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .rca-table tbody tr.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .rca-table tbody tr:hover {
+            background: #F0F8FF;
+        }
+
+        .rca-table td:first-child {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.3em;
+            text-align: center;
+            background: #F5F0FF;
+        }
+
+        .rca-table td:nth-child(2) {
+            color: #1C3D5A;
+            font-weight: 600;
+        }
+
+        .rca-table td:nth-child(3) {
+            color: #333;
+            background: #F8F9FA;
+        }
+
+        /* Conclusion */
+        .conclusion {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.6);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s ease-out;
+            border: 2px solid #00ffff;
+        }
+
+        .conclusion.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .conclusion h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        .conclusion p {
+            font-size: 1.15em;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1em;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="hex-grid"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
+    <div class="scan-wave"></div>
+    <div class="scan-wave" style="animation-delay: 2s;"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>🔍 RCA АНАЛИЗ</h1>
+            <div class="risk-name">Риск: Задержка в предоставлении услуги эвакуации</div>
+        </div>
+        <button class="back-btn" onclick="window.location.href='risk_analysis_main.html'">← Назад</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Office Scene with Cartoon People -->
+        <div class="office-scene">
+            <div class="people-container">
+                <!-- Person 1 - Ahmed -->
+                <div class="cartoon-person person-1" id="person1">
+                    <div class="speech-bubble" id="bubble1" style="display: none;">
+                        <div class="speaker">Ахмед спрашивает:</div>
+                        <div class="message" id="message1"></div>
+                    </div>
+                    <div class="person-body">
+                        <div class="person-head">
+                            <div class="person-hair"></div>
+                            <!-- <div class="person-eyes">👁️ 👁️</div> -->
+                            <div class="person-mouth"></div>
+                        </div>
+                        <div class="person-torso">
+                            <div class="person-arms">
+                                <div class="arm arm-left"></div>
+                                <div class="arm arm-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="person-label">
+                        <div class="person-name">Ахмед</div>
+                        <div class="person-role">Руководитель проекта</div>
+                    </div>
+                </div>
+
+                <!-- Person 2 - Mohammed -->
+                <div class="cartoon-person person-2" id="person2">
+                    <div class="speech-bubble" id="bubble2" style="display: none;">
+                        <div class="speaker">Мохаммед отвечает:</div>
+                        <div class="message" id="message2"></div>
+                    </div>
+                    <div class="person-body">
+                        <div class="person-head">
+                            <div class="person-hair"></div>
+                            <!-- <div class="person-eyes">👁️ 👁️</div> -->
+                            <div class="person-mouth"></div>
+                        </div>
+                        <div class="person-torso">
+                            <div class="person-arms">
+                                <div class="arm arm-left"></div>
+                                <div class="arm arm-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="person-label">
+                        <div class="person-name">Мохаммед</div>
+                        <div class="person-role">Технический директор</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                 АНАЛИЗ КОРНЕВЫХ ПРИЧИН ( ПОЧЕМУ?)
+            </div>
+
+            <table class="rca-table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Вопрос</th>
+                        <th>Ответ</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td>1</td>
+                        <td>Почему происходит задержка в предоставлении услуги эвакуации?</td>
+                        <td>Потому что система не может быстро найти ближайший доступный эвакуатор для клиента.</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Почему система не может быстро найти ближайший эвакуатор?</td>
+                        <td>Потому что GPS-координаты эвакуаторов обновляются с большой задержкой или неточно.</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Почему GPS-координаты обновляются с задержкой?</td>
+                        <td>Потому что в отдалённых районах Саудовской Аравии слабое покрытие мобильного интернета (3G).</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Почему операторы работают в районах со слабым интернетом?</td>
+                        <td>Потому что поломки автомобилей часто происходят в пустынных и отдалённых регионах.</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Почему система не имеет решения для работы в офлайн-режиме?</td>
+                        <td>Потому что при разработке не было предусмотрено кэширование последних координат.</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Почему не было предусмотрено кэширование при разработке?</td>
+                        <td>Потому что бюджет проекта ограничен ($100/месяц) и команда состоит только из 3 фрилансеров.</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Почему ограниченная команда не учла этот сценарий?</td>
+                        <td>Потому что не было проведено достаточное тестирование в реальных условиях Саудовской Аравии.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Conclusion -->
+            <div class="conclusion" id="conclusion">
+                <h3>📋 ВЫВОД </h3>
+                <p>Необходимо провести полноценное тестирование системы в реальных условиях Саудовской Аравии (включая пустынные регионы) и внедрить офлайн-режим с кэшированием последних координат эвакуаторов для обеспечения работы при слабом интернете.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Hammilha Project | RCA Analysis | Kazan Federal University | 2025
+    </div>
+
+    <script>
+        // Matrix Rain
+        const matrixContainer = document.getElementById('matrixRain');
+        const chars = '01アイウエオカキクケコ';
+        const columns = Math.floor(window.innerWidth / 25);
+
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = (i * 25) + 'px';
+            column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            column.style.animationDelay = (Math.random() * 5) + 's';
+            
+            let text = '';
+            for (let j = 0; j < 25; j++) {
+                text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+            }
+            column.innerHTML = text;
+            matrixContainer.appendChild(column);
+        }
+
+        // Conversation data
+        const conversation = [
+            { question: "Почему происходит задержка в предоставлении услуги эвакуации?", answer: "Потому что система не может быстро найти ближайший доступный эвакуатор." },
+            { question: "Почему система не может быстро найти ближайший эвакуатор?", answer: "Потому что GPS-координаты обновляются с большой задержкой." },
+            { question: "Почему GPS-координаты обновляются с задержкой?", answer: "Потому что слабое покрытие мобильного интернета в пустынях." },
+            { question: "Почему операторы работают в районах со слабым интернетом?", answer: "Потому что поломки часто происходят в отдалённых регионах." },
+            { question: "Почему система не имеет решения для офлайн-режима?", answer: "Потому что не было предусмотрено кэширование координат." },
+            { question: "Почему не было предусмотрено кэширование?", answer: "Потому что бюджет ограничен и команда маленькая." },
+            { question: "Почему команда не учла этот сценарий?", answer: "Потому что не было достаточного тестирования в реальных условиях." }
+        ];
+
+        const rows = document.querySelectorAll('#tableBody tr');
+        let currentStep = 0;
+
+        function showConversation() {
+            if (currentStep < conversation.length) {
+                // Show question (person 1)
+                document.getElementById('person1').classList.add('person-talking');
+                document.getElementById('bubble1').style.display = 'block';
+                document.getElementById('message1').textContent = conversation[currentStep].question;
+                document.getElementById('bubble2').style.display = 'none';
+                document.getElementById('person2').classList.remove('person-talking');
+
+                setTimeout(() => {
+                    // Show answer (person 2)
+                    document.getElementById('person1').classList.remove('person-talking');
+                    document.getElementById('person2').classList.add('person-talking');
+                    document.getElementById('bubble2').style.display = 'block';
+                    document.getElementById('message2').textContent = conversation[currentStep].answer;
+
+                    // Show table row
+                    rows[currentStep].classList.add('visible');
+
+                    setTimeout(() => {
+                        currentStep++;
+                        if (currentStep < conversation.length) {
+                            showConversation();
+                        } else {
+                            // Show conclusion
+                            document.getElementById('person2').classList.remove('person-talking');
+                            document.getElementById('conclusion').classList.add('visible');
+                        }
+                    }, 2500);
+                }, 2000);
+            }
+        }
+
+        // Start conversation after page load
+        setTimeout(showConversation, 1500);
+    </script>
+</body>
+</html>
